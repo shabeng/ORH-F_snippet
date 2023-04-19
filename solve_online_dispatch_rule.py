@@ -22,7 +22,7 @@ rules = [
     time_earliest_arriving, time_nearest_available, random_available,
     balance_crowded_zone, balance_balanced_zone,
 ]
-n_levels = 1  # 20
+n_levels = 20
 level_dur_time = 30 * 60
 
 Z_measures_dict_seed = defaultdict(dict)
@@ -89,11 +89,11 @@ df_norm = df.copy()
 for measure in measures:
     df_norm[measure] = ((df_norm[measure] / df_norm[measure].time_earliest_arriving) - 1) * 100
 
-
 plot_bars_results(3, [df_norm.index[1:]] * 3, [df_norm[measure][1:] for measure in measures],
                   x_ticks=['CV', 'R', 'MC', 'MC-N'], y_label='Increase [%]',
                   data_rules_num=0, color_ours=(40 / 250, 90 / 250, 224 / 250),
-                  plus_label=0.2, minus_label=0.75, l_lim=-6, h_lim=10, bar_width=0.75,
+                  plus_label=0.13, minus_label=0.33, l_lim=-4, h_lim=2.5, bar_width=0.77,
                   sub_titles_lst=['Z', 'F', 'GI'],
-                  main_title=f'Increase in Measures Relative to EA - Seed = {seed}', dpi=500, fig_size=(4, 3),
-                  bar_fontsize=5.5, yticks_label_fontsize=3.5)
+                  main_title=f'Increase [%] Relative to EA - Seed = {seed}', dpi=500, fig_size=(4, 3),
+                  bar_fontsize=6.5, yticks_label_fontsize=5,
+                  save_fig=True, path_save='experiments', graph_name=f'online_seed_{seed}')
