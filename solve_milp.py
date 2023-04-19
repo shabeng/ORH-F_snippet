@@ -8,7 +8,7 @@ import sys
 # My repo
 from script.ProblemObjects import system as s
 from script.SolutionsApproch.Simulation.simulation import run_simulation_rule
-from script.SolutionsApproch.Simulation.dispatch import time_earliest_arriving
+from script.SolutionsApproch.Simulation.dispatch import time_earliest_arriving, 
 from script.utilis.utilis import create_simu_sol_to_milp_sol, list_to_dict_solution, copy_objects_lst, \
     assert_system_settings
 from script.SolutionsApproch.MILP.offlineMILP import OfflineProblem
@@ -16,7 +16,7 @@ from script.SolutionsApproch.MILP.offlineMILP import OfflineProblem
 # System parameters
 from experiments import system_param as sp
 
-# Create an instance of the system
+# Create an instance of the system for the MILP
 seed = 10020
 system_instance = s.System(seed_num=seed, num_time_points=sp.T, num_vehicles=sp.V, travel_time_mat=sp.t_ij,
                            reqs_arr_prob=sp.reqs_arr_p, reqs_od_probs=sp.reqs_od_p_mat, payment_func=sp.pay_func,
@@ -54,6 +54,7 @@ off_prob.validate_sol()
 print(f'MILP Optimal solution value: Z = {off_prob.solution.objective_value}')
 
 # Solve the online problem with the benchmark dispatching rules
+# Create an instance of the system to solve the online variation with the basic decision rules
 
 # Show results with the bar plot
 
