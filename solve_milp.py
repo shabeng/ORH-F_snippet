@@ -1,16 +1,9 @@
 """Running the program"""
 # Python Packages
-import numpy as np
 import time
-import pickle
-import sys
 
 # My repo
 from script.ProblemObjects import system as s
-from script.SolutionsApproch.Simulation.simulation import run_simulation_rule
-from script.SolutionsApproch.Simulation.dispatch import time_earliest_arriving, 
-from script.utilis.utilis import create_simu_sol_to_milp_sol, list_to_dict_solution, copy_objects_lst, \
-    assert_system_settings
 from script.SolutionsApproch.MILP.offlineMILP import OfflineProblem
 
 # System parameters
@@ -52,9 +45,3 @@ with open(path_str, 'w') as cplex_log:
 end_time = time.time()
 off_prob.validate_sol()
 print(f'MILP Optimal solution value: Z = {off_prob.solution.objective_value}')
-
-# Solve the online problem with the benchmark dispatching rules
-# Create an instance of the system to solve the online variation with the basic decision rules
-
-# Show results with the bar plot
-
