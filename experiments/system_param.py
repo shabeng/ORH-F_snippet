@@ -72,15 +72,3 @@ if __name__ == '__main__':
                           requests_group.copy(), center_zones_inxs, warmup_reqs_num,
                           expiration_method=expiration_method,
                           fixed_exp_c=expiration_dur_c, fixed_exp_s=expiration_dur_s)
-# requests_group = {** {i: {'group': 'c', 'neigh': 0} for i in center_zones_inxs},
-#                   ** {j: {'group': 's', 'neigh': loc_to_rec_num(j, width=width, sub_width=int(width / 2))}
-#                       for j in range(center_zones_num, center_zones_num + suburb_zones_num)},
-#                   ** {'c,c': 0, 'c,s': 1, 's,c': 2, 's,s': 3},
-#                   ** {'group_num': 4, 'neigh_num': 9, 'zone_num': t_ij.shape[0]}}
-# requests_group = {**{(i, j): 0 for i in range(center_zones_num) for j in range(center_zones_num)},
-#                   **{(i, j): 1 for i in range(center_zones_num)
-#                      for j in range(center_zones_num, center_zones_num + suburb_zones_num)},
-#                   **{(i, j): 2 for i in range(center_zones_num, center_zones_num + suburb_zones_num)
-#                      for j in range(center_zones_num)},
-#                   **{(i, j): 3 for i in range(center_zones_num, center_zones_num + suburb_zones_num)
-#                      for j in range(center_zones_num, center_zones_num + suburb_zones_num)}}
