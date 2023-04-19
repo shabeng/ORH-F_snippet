@@ -17,7 +17,7 @@ from script.SolutionsApproch.MILP.offlineMILP import OfflineProblem
 from experiments import system_param as sp
 
 # Create an instance of the system
-seed = 123456789
+seed = 10020
 system_instance = s.System(seed_num=seed, num_time_points=sp.T, num_vehicles=sp.V, travel_time_mat=sp.t_ij,
                            reqs_arr_prob=sp.reqs_arr_p, reqs_od_probs=sp.reqs_od_p_mat, payment_func=sp.pay_func,
                            G_script=sp.requests_group.copy(), city_center_zones=sp.center_zones_inxs,
@@ -27,6 +27,31 @@ system_instance = s.System(seed_num=seed, num_time_points=sp.T, num_vehicles=sp.
 
 # Solve its offline variation of the problem with the MILP model using CPLEX api for python
 objective_name = 'Z'
+
+# MILP Model
+start_time = time.time()
+off_prob = OfflineProblem(system_instance, objective=objective_name, time_limit=60 * 60 * 12)
+print(f'Start Adding Variables')
+off_prob.add_decision_variables()
+var_time = time.time()
+print(f'Added Variables: {var_time - start_time}')
+print(f'Start Adding Constraints')
+off_prob.add_constraints()
+cons_time = time.time()
+print(f'Added Constraints: {cons_time - var_time}')
+
+# Solve model
+solve_time = time.time()
+path_str = f'experiments/cplex_log_seed{seed}.log'
+with open(path_str, 'w') as cplex_log:
+    off_prob.prob.set_results_stream(cplex_log)
+    off_prob.prob.set_warning_stream(cplex_log)
+    off_prob.prob.set_error_stream(cplex_log)
+    off_prob.prob.set_log_stream(cplex_log)
+    off_prob.solve_model()
+end_time = time.time()
+off_prob.validate_sol()
+print(f'MILP Optimal solution value: Z = {off_prob.solution.objective_value}')
 
 # Solve the online problem with the benchmark dispatching rules
 
