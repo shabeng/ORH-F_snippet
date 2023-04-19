@@ -43,95 +43,6 @@ def results_df_creation(df, is_return_ratio_df=False):
         return df.mean()[rule_names], df_ratio.mean()[rule_names]
 
 
-def plot_bars_results_old(plot_num, x_vals_lst, y_vals_lst, x_ticks, y_label,
-                          data_rules_num, color,
-                          plus_label, minus_label, l_lim, h_lim, bar_width,
-                          sub_titles_lst, main_title,
-                          annotate_rule=(False, 0, 0, 0, 'None'),
-                          save_fig=False, path_save='', graph_name='', dpi=1000, fig_size=None,
-                          ):
-    fig_size = fig_size if fig_size is not None else ((4 / 5) * len(x_ticks) * plot_num, 5)
-    f, axes = plt.subplots(1, plot_num, sharey=True, sharex=True, figsize=fig_size, dpi=dpi)
-    for j in range(plot_num):
-        x_vals = x_vals_lst[j]
-        y_vals = y_vals_lst[j]
-        ax = axes[j] if plot_num > 1 else axes
-        # Save the chart so we can loop through the bars below.
-        bars = ax.bar(
-            x=x_vals,
-            height=list(y_vals),
-            tick_label=x_ticks,
-            width=bar_width,
-        )
-        for i in range(len(bars[:-data_rules_num])):
-            bars[i].set_color((40 / 250, 90 / 250, 224 / 250))
-
-        for i in range(1, data_rules_num + 1):
-            bars[-i].set_color(color)
-
-        bars[len(bars) - data_rules_num - 1].set_color((105 / 250, 205 / 250, 205 / 250))
-        bars[len(bars) - data_rules_num - 2].set_color((105 / 250, 205 / 250, 205 / 250))
-
-        # Axis formatting.
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        ax.spines['left'].set_visible(False)
-        ax.spines['bottom'].set_color('#DDDDDD')
-        ax.tick_params(bottom=False, left=False)
-        ax.set_axisbelow(True)
-        ax.yaxis.grid(True, color='#EEEEEE')
-        ax.xaxis.grid(False)
-
-        # Add text annotations to the top of the bars.
-        bar_color = bars[0].get_facecolor()
-        for ind, bar in enumerate(bars):
-            if ind in range(len(bars) - data_rules_num, len(bars) + 1):
-                bar_color = color
-            elif ind in [len(bars) - data_rules_num - 1, len(bars) - data_rules_num - 2]:
-                bar_color = (105 / 250, 205 / 250, 205 / 250)
-            if bar.get_height() > 0:
-                h = bar.get_height() + plus_label
-            else:
-                h = bar.get_height() - minus_label
-            ax.text(
-                bar.get_x() + bar.get_width() / 2,
-                h,
-                round(bar.get_height(), 2),
-                horizontalalignment='center',
-                color=bar_color,
-                weight='bold'
-            )
-
-        ax.set_ylim((l_lim, h_lim))
-        # Add brackets to Our policies
-        if annotate_rule[0]:
-            draw_brace(ax=ax, xspan=(annotate_rule[1], annotate_rule[2]), yy=annotate_rule[3],
-                       text='Ours')
-
-        # Add labels and a title. Note the use of `labelpad` and `pad` to add some
-        # extra space between the text and the tick labels.
-        # if plot_num == 1 or (plot_num > 1 and j == 1):
-        #     ax.set_xlabel('Rule Name', labelpad=15, color='#333333', size=13)
-        # if j == 0:
-        #     ax.set_ylabel(y_label, labelpad=10, color='#333333', size=13)
-        #
-        #
-        ax.set_title(sub_titles_lst[j], pad=40, color='#333333',
-                     weight='bold', size=14)
-    if annotate_rule[0]:
-        f.supxlabel('Rule Name', color='#333333', size=13, y=0.1)
-    else:
-        f.supxlabel('Rule Name', color='#333333', size=13)
-
-    f.supylabel(y_label, color='#333333', size=13)
-    f.suptitle(main_title, fontsize=15, weight='bold')
-
-    f.tight_layout()
-    if save_fig:
-        plt.savefig(f'{path_save}/{graph_name}.png', bbox_inches='tight')
-    plt.show()
-
-
 def plot_bars_results(plot_num, x_vals_lst, y_vals_lst, x_ticks, y_label,
                       data_rules_num, color_ours,
                       plus_label, minus_label, l_lim, h_lim, bar_width,
@@ -164,7 +75,8 @@ def plot_bars_results(plot_num, x_vals_lst, y_vals_lst, x_ticks, y_label,
                 x=x_vals,
                 height=list(y_vals),
                 tick_label=x_ticks,
-                width=bar_width,
+                width=bar_width, color=(40 / 250, 90 / 250, 224 / 250)
+
             )
             for i in range(len(bars[:-data_rules_num])):
                 bars[i].set_color((40 / 250, 90 / 250, 224 / 250))
@@ -216,12 +128,12 @@ def plot_bars_results(plot_num, x_vals_lst, y_vals_lst, x_ticks, y_label,
                      weight='bold', size=objtitle_fontsize)
 
         ax.set_xticklabels(x_ticks, rotation=0, size=xticks_label_fontsize)
-        ax.set_yticks(np.arange(l_lim, h_lim + yticks_diff, yticks_diff), rotation=0, size=yticks_label_fontsize)
+        ax.set_yticks(np.arange(l_lim, h_lim + yticks_diff, yticks_diff))
         ax.set_yticklabels(np.arange(l_lim, h_lim + yticks_diff, yticks_diff), rotation=0, size=yticks_label_fontsize)
 
-    f.supxlabel('Rule Name', color='#333333', size=supxlabel_fontsize, y=supxlabel_y_loc)
+    # f.supxlabel('Rule Name', color='#333333', size=supxlabel_fontsize, y=supxlabel_y_loc)
 
-    f.supylabel(y_label, color='#333333', size=supylabel_fontsize)
+    # f.supylabel(y_label, color='#333333', size=supylabel_fontsize)
     f.suptitle(main_title, fontsize=suptitle_fontsize, weight='bold', y=suptitle_y_loc, color='#333333')
 
     if is_hatched_bars:

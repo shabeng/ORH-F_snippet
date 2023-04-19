@@ -1,23 +1,17 @@
 # Python Packages
 import pandas as pd
-import numpy as np
-import pickle
-import sys
-from os import listdir
-from os.path import isfile, join
+
 import time
 from collections import defaultdict
 
 # My Repo
 import script.ProblemObjects.system as s
 from script.SolutionsApproch.Simulation.simulation import run_simulation_rule
-from script.SolutionsApproch.Simulation.dispatch import time_earliest_vacant, time_earliest_arriving, \
+from script.SolutionsApproch.Simulation.dispatch import time_earliest_arriving, \
     time_nearest_available, random_available, \
     balance_crowded_zone, balance_balanced_zone
 from script.utilis.utilis import calc_partial_measures_of_sol
-from script.utilis.utilis_data_driven_rule import create_seeds_lst_for_refer
-from script.utilis.utilis_simulation import save_geo_states_df, create_states_distance_statistic, \
-    save_simulation_characteristic
+from script.utilis.utilis_plot import plot_bars_results
 
 # System parameters
 from experiments import system_param as sp
@@ -28,10 +22,8 @@ rules = [
     time_earliest_arriving, time_nearest_available, random_available,
     balance_crowded_zone, balance_balanced_zone,
 ]
-n_levels = 20
+n_levels = 1  # 20
 level_dur_time = 30 * 60
-
-measures = ['full', f'level_{n_levels}']
 
 Z_measures_dict_seed = defaultdict(dict)
 F_measures_dict_seed = defaultdict(dict)
@@ -40,9 +32,6 @@ print(f'Running {len(rules)} Rules - Good Luck! :)')
 warm_up_time = 600
 
 time_start_rule = time.time()
-for m in measures:
-    Z_measures_dict_seed[m]['Seed'] = seed
-    F_measures_dict_seed[m]['Seed'] = seed
 
 for ind, rule in enumerate(rules):
     rule_name = str(rule).split(' ')[1]
@@ -73,26 +62,38 @@ for ind, rule in enumerate(rules):
                                 condition=lambda req_, sys_: req_.get_arrival_time() >= warm_up_time,
                                 keep_state_information=False)
 
-    for m in measures:
-        if m == 'full':
-            if ind == 0:
-                assert system_rule.sys_reqs_size == r_Gs[0].sum(), 'r_G and |K| are not equal for full, line 182'
-                Z_measures_dict_seed[m]['reqNum'] = system_rule.sys_reqs_size
-                F_measures_dict_seed[m]['reqNum'] = system_rule.sys_reqs_size
-            Z_measures_dict_seed[m][rule_name] = z_vals[0]
-            F_measures_dict_seed[m][rule_name] = f_vals[0]
-        elif m == f'level_{n_levels}':
-            if ind == 0:
-                Z_measures_dict_seed[m]['reqNum'] = r_Gs[1].sum()
-                F_measures_dict_seed[m]['reqNum'] = r_Gs[1].sum()
-            Z_measures_dict_seed[m][rule_name] = z_vals[1]
-            F_measures_dict_seed[m][rule_name] = f_vals[1]
-            # Fill rate by group:
-            NL = int(n_levels)
-            z_level_all, f_level_all, r_g_level_all, x_g_level_all = \
-                calc_partial_measures_of_sol(sol_lst=solution_lst, system_obj=system_rule,
-                                             partial_cond=lambda req_, sys_: req_.get_arrival_time() >= warm_up_time)
-            assert z_level_all == z_vals[1], f'Different Z values! seed = {seed} | rule = {rule_name} | level = 3'
-            assert f_level_all == f_vals[1], f'Different F values! seed = {seed} | rule = {rule_name} | level = 3'
+    if ind == 0:
+        Z_measures_dict_seed['reqNum'] = r_Gs[1].sum()
+        F_measures_dict_seed['reqNum'] = r_Gs[1].sum()
+    Z_measures_dict_seed[rule_name] = z_vals[1]
+    F_measures_dict_seed[rule_name] = f_vals[1]
+    # Fill rate by group:
+    NL = int(n_levels)
+    z_level_all, f_level_all, r_g_level_all, x_g_level_all = \
+        calc_partial_measures_of_sol(sol_lst=solution_lst, system_obj=system_rule,
+                                     partial_cond=lambda req_, sys_: req_.get_arrival_time() >= warm_up_time)
+    assert z_level_all == z_vals[1], f'Different Z values! seed = {seed} | rule = {rule_name} | level = 3'
+    assert f_level_all == f_vals[1], f'Different F values! seed = {seed} | rule = {rule_name} | level = 3'
 
 
+# Show the results:
+measures = ['Z', 'F', 'GI']
+df = pd.DataFrame()
+df['Z'] = Z_measures_dict_seed.values()
+df.index = Z_measures_dict_seed.keys()
+df['F'] = F_measures_dict_seed.values()
+df['GI'] = df.Z / df.F
+df.drop('reqNum', inplace=True)
+
+df_norm = df.copy()
+for measure in measures:
+    df_norm[measure] = ((df_norm[measure] / df_norm[measure].time_earliest_arriving) - 1) * 100
+
+
+plot_bars_results(3, [df_norm.index[1:]] * 3, [df_norm[measure][1:] for measure in measures],
+                  x_ticks=['CV', 'R', 'MC', 'MC-N'], y_label='Increase [%]',
+                  data_rules_num=0, color_ours=(40 / 250, 90 / 250, 224 / 250),
+                  plus_label=0.2, minus_label=0.75, l_lim=-6, h_lim=10, bar_width=0.75,
+                  sub_titles_lst=['Z', 'F', 'GI'],
+                  main_title=f'Increase in Measures Relative to EA - Seed = {seed}', dpi=500, fig_size=(4, 3),
+                  bar_fontsize=5.5, yticks_label_fontsize=3.5)
