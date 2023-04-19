@@ -7,4 +7,4 @@ This repo includes the following parts:
 2. Solving the offline variation of the problem with one of my MILP models, using the CPLEX API for python using the SolutionsApproch/MILP. 
 3. Solving the online problem with the dispatching rules, which were the benchmark in my thesis, and showing the results with a bar plot, using SolutionsApproch/Simulation and more. 
 
-You could use the running files - 
+You could use the running files - solve_milp.py and solve_online_dispatch_rule.py, to run the different available parts.
