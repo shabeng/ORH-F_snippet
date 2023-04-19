@@ -29,9 +29,6 @@ def select_veh(vehs_lst, req_obj, sys_obj, tie_func=random_available):
     :param tie_func: function to determine how to select between same status vehicles (that have the same score)
     :return: one veh object
     """
-    # rs = sys_obj.sys_seed
-    # ind = rs.randint(0, len(vehs_lst))
-    # vehs_lst[ind]
     veh_chosen = tie_func(vehs_lst, req_obj, sys_obj)
     return veh_chosen
 
@@ -46,9 +43,6 @@ def select_zone_max(avail_vehs, system_obj, measures_array):
     :param measures_array: 1d array with the measure value for each neighborhood
     :return: list of vehicles objects in the same neighborhood that has the highest measure
     """
-    # Zones where there are available vehicles
-    # zones_available = defaultdict(list)
-    # [zones_available[system_obj.find_geo_attr('neigh', zone_id=veh.get_zone())].append(veh) for veh in avail_vehs]
     zones_available = create_neigh_vehs_mapping(system_obj, vehs_lst=avail_vehs)
     inds_zones_available = sorted(zones_available.keys())
     if len(inds_zones_available) > 1:

@@ -1,7 +1,6 @@
 # Python Packages
 import pandas as pd
 from itertools import chain
-import numpy as np
 import pickle
 
 # My Repo
@@ -58,28 +57,13 @@ class Solution:
         return routes
 
     def find_reqs_not_served(self, problem_obj):
-        # find all the indices of the requests the solution have rejected
-        # mask = (self.solution_full.varNames.str.contains('p_')) & \
-        #        (self.solution_full.varValues < 1 - 10 ** -9)
-        # reqs_not_served = self.solution_full.loc[mask].varNames
-        # reqs_not_served_ids = [int(req.split('_')[-1]) for req in reqs_not_served]
         reqs_served_ids = list(chain.from_iterable(self.routes.values()))
         reqs_not_served_ids = [req.k_id for req in problem_obj.system.sys_reqs if req.k_id not in reqs_served_ids]
-        return reqs_not_served_ids
-
         return reqs_not_served_ids
 
     def calc_x_G(self, problem_obj, warmup_bol=False):
         system_obj = problem_obj.system
         x_G = calc_x_G(system_obj, self.routes, warmup_bol)
-        # x_G = np.zeros_like(problem_obj.system.sys_r_G)
-        # warmup_num = problem_obj.system.warmup if warmup_bol else 0
-        # for route in self.routes.values():
-        #     for req_id in route:
-        #         if req_id > warmup_num:
-        #             req = problem_obj.system.sys_reqs[req_id - 1]
-        #             req_group = req.find_request_type(problem_obj.system.sys_G_script)
-        #             x_G[req_group] += 1
         return x_G
 
     def calc_z(self):

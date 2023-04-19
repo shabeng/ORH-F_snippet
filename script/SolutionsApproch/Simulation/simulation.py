@@ -135,37 +135,3 @@ def run_simulation_route_measures(system_obj, v_id, route):
         veh.update_match(True, *veh_info, req)
     cruise_time, wait_time, gain = veh.write_row_one_veh()
     return wait_time
-
-
-if __name__ == '__main__':
-    from script.ProblemObjects import system as s
-    import PreliminaryExperiments.pocML.solutionCollection.exp8.system_param_81 as sp
-    from script.SolutionsApproch.Simulation.dispatch import time_earliest_arriving,  random_available, \
-        time_nearest_available, balance_crowded_zone, balance_balanced_zone
-    from script.SolutionsApproch.ML.voting_schemes import uniform_vote, inverse_distance_vote, percentage_vote, \
-        inverse_rank_vote, minmax_weighted_distance_vote, dual_rank_minmax_vote
-    from script.SolutionsApproch.ML.data_driven_rules import data_driven_rule_wo_rej
-    from script.SolutionsApproch.ML.states_distance_functions import state_dist_avail_areas_euc
-    from script.SolutionsApproch.ML.preprocess import create_data_sets
-
-    import numpy as np
-
-    rules = [
-        time_earliest_arriving, random_available,
-        time_nearest_available, balance_crowded_zone, balance_balanced_zone
-    ]
-
-    seeds = np.random.randint(999999, size=5)
-    for seed_ind, seed_sys in enumerate(seeds):
-        for ind, rule in enumerate(rules):
-            system = s.System(seed_sys, sp.T, sp.V, sp.t_ij, sp.reqs_arr_p, sp.reqs_od_p_mat, sp.pay_func,
-                              sp.requests_group.copy(), sp.center_zones_inxs, sp.warmup_reqs_num,
-                              expiration_method=sp.expiration_method,
-                              fixed_exp_c=sp.expiration_dur_c, fixed_exp_s=sp.expiration_dur_s)
-            z_vals, f_vals, rgs, sol_lst, pickup_time = run_simulation_rule(system, rule,
-                                                                            warm_up_func=time_earliest_arriving,
-                                                                            warm_up_time=600,
-                                                                            area_vehs_select_func=time_earliest_arriving)
-            rule_name = str(rule).split(' ')[1]
-            print(f'Rule {rule_name}: Z = {z_vals} | F = {f_vals}')
-        print(f'Finished seed {seed_ind}!\n')
