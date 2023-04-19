@@ -10,7 +10,7 @@ from script.SolutionsApproch.MILP.offlineMILP import OfflineProblem
 from experiments import system_param as sp
 
 # Create an instance of the system for the MILP
-seed = 10020
+seed = 999221
 system_instance = s.System(seed_num=seed, num_time_points=sp.T, num_vehicles=sp.V, travel_time_mat=sp.t_ij,
                            reqs_arr_prob=sp.reqs_arr_p, reqs_od_probs=sp.reqs_od_p_mat, payment_func=sp.pay_func,
                            G_script=sp.requests_group.copy(), city_center_zones=sp.center_zones_inxs,
